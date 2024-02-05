@@ -59,15 +59,4 @@ jobs:
         run: ./newgithub/clean.sh
 
       - name: Clean Runs on Success
-        run: gh workflow run clean.yml -f runId=$GITHUB_RUN_ID
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Delete workflow runs
-        uses: Mattraks/delete-workflow-runs@v2
-        if: always()
-        with:
-          token: ${{ github.token }}
-          repository: ${{ github.repository }}
-          retain_days: 0
-          keep_minimum_runs: 0
+        run: curl -sX POST ${{ secrets.JOB_HOSTING }}/v2/done/$GITHUB_RUN_ID
