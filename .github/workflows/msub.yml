@@ -47,7 +47,7 @@ jobs:
           node .github/workflows/test.mjs "$input"
 
       - name: main - ${{ steps.ip.outputs.region }}
-        run : ./newgithub/msub.sh --mkv "$(curl --fail -s ${{ secrets.JOB_HOSTING }}/v2/job/${{ inputs.jobId }})" --save "julian:new4/"
+        run : ./newgithub/msub.sh --mkv "$(curl --fail -s ${{ secrets.JOB_HOSTING }}/v2/job/${{ inputs.jobId }})" --save "julian:new5/"
         working-directory: ${{ github.workspace }}/lerna24
         env:
           SS_ROT_KEY_CONFIG_KEY: ${{ secrets.SS_ROT_KEY_CONFIG_KEY }}
