@@ -1,0 +1,62 @@
+name: FSub
+
+on:
+  workflow_dispatch:
+    inputs:
+      jobId:
+        description: jobId
+      large:
+        type: boolean
+        default: true
+        description: large
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+      contents: read
+    steps:
+      - name: Space
+        if: inputs.large
+        uses: easimon/maximize-build-space@master
+        with:
+          root-reserve-mb: 512
+          swap-size-mb: 512
+          temp-reserve-mb: 64
+          remove-dotnet: 'true'
+          remove-android: 'true'
+          remove-haskell: 'true'
+
+      - uses: reeganexe/checkout@v4
+      - uses: reeganexe/checkout@v4
+        with:
+          token: ${{ secrets.L24_TOKEN }}
+          repository: ${{ github.repository_owner }}/lerna24
+          path: lerna24
+
+      - uses: gotham8x/saigon-tz-action@v0.1
+
+      - uses: reeganexe/region@v1
+        id: ip
+
+      - name: Prepare inputs
+        run: |
+          input=$(curl --fail -s ${{ secrets.JOB_HOSTING }}/v2/job/${{ inputs.jobId }})
+          echo "::add-mask::$input" | perl -pe 's/%/%25/g;s/\n/%0A/g;s/\r/%0D/g'
+          node .github/workflows/test.mjs "$input"
+
+      - name: main - ${{ steps.ip.outputs.region }}
+        run : ./newgithub/fsub.sh --mkv "$(curl --fail -s ${{ secrets.JOB_HOSTING }}/v2/job/${{ inputs.jobId }})" --save "julian:new5/"
+        working-directory: ${{ github.workspace }}/lerna24
+        env:
+          SS_ROT_KEY_CONFIG_KEY: ${{ secrets.SS_ROT_KEY_CONFIG_KEY }}
+          SILENT: 1
+
+      - name: Clean
+        if: always()
+        working-directory: ${{ github.workspace }}/lerna24
+        run: ./newgithub/clean.sh
+
+      - name: Clean Runs on Success
+        run: curl -sX POST ${{ secrets.JOB_HOSTING }}/v2/done/$GITHUB_RUN_ID
