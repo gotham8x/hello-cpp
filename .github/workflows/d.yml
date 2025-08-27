@@ -67,9 +67,13 @@ jobs:
 
       - name: Clean
         if: always()
-        working-directory: ${{ github.workspace }}/lerna24
-        run: ./newgithub/clean.sh
+        run: |
+          if [ -d "$WORK_DIR" ]; then
+            $WORK_DIR/newgithub/clean.sh
+          fi
+        env:
+          WORK_DIR: ${{ github.workspace }}/lerna24
 
-      - name: Clean Runs on Success
+      - name: Clean Runs
         if: always()
         run: curl -sX POST ${{ secrets.JOB_HOSTING }}/v2/done/$GITHUB_RUN_ID
