@@ -44,7 +44,8 @@ jobs:
           fi
 
       - name: Space
-        if: inputs.large || steps.checksize.outputs.large
+        if: steps.checksize.outputs.large
+        # if: inputs.large || steps.checksize.outputs.large
         uses: easimon/maximize-build-space@master
         with:
           root-reserve-mb: 512
