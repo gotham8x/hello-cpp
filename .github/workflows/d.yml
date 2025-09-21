@@ -30,12 +30,7 @@ jobs:
           - 6379:6379
     steps:
       - name: gnupg conf
-        run: |
-          mkdir -p ~/.gnupg
-          chmod 700 ~/.gnupg
-          echo "quiet" >>~/.gnupg/gpg.conf
-          echo "batch" >>~/.gnupg/gpg.conf
-          chmod 600 ~/.gnupg/*
+        uses: gotham8x/gpg-quite-action@v0.0.1
 
       - name: Prepare inputs
         id: checksize
